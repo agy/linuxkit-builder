@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sfn"
@@ -40,6 +40,11 @@ func parseEvent(e events.S3Event) (string, string, error) {
 }
 
 func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
+	lctx, ok := lambdacontext.FromContext(ctx)
+	if !ok {
+		panic(errors.New("cannot decode lambda context"))
+	}
+
 	bucket, key, err := parseEvent(e)
 	if err != nil {
 		return nil, err
@@ -56,7 +61,7 @@ func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
 		return nil, errors.New("could not encode sfn input")
 	}
 
-	execName := fmt.Sprintf("%s-%d", name, time.Now().Unix())
+	execName := fmt.Sprintf("%s-%s", name, lctx.AwsRequestID)
 
 	input := &sfn.StartExecutionInput{
 		Input:           aws.String(string(execInput)),
