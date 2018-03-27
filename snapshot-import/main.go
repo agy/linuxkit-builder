@@ -16,7 +16,30 @@ type event struct {
 	Key    string `json:"key"`
 }
 
-func importSnapshot(ctx context.Context, e event) (*ec2.ImportSnapshotOutput, error) {
+type bucket struct {
+	S3Bucket *string `json:"bucket"`
+	S3Key    *string `json:"key"`
+}
+
+type detail struct {
+	Description   *string  `json:"description"`
+	DiskImageSize *float64 `json:"size"`
+	Format        *string  `json:"format"`
+	Progress      *string  `json:"progress"`
+	SnapshotId    *string  `json:"snapshot_id"`
+	Status        *string  `json:"status"`
+	StatusMessage *string  `json:"status_message"`
+	Url           *string  `json:"url"`
+	UserBucket    *bucket  `json:"bucket"`
+}
+
+type output struct {
+	ImportTaskId *string `json:"task_id"`
+	Description  *string `json:"description"`
+	TaskDetail   *detail `json:"task_detail"`
+}
+
+func importSnapshot(ctx context.Context, e event) (*output, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -41,7 +64,26 @@ func importSnapshot(ctx context.Context, e event) (*ec2.ImportSnapshotOutput, er
 		return nil, err
 	}
 
-	return res, nil
+	o := &output{
+		Description:  res.Description,
+		ImportTaskId: res.ImportTaskId,
+		TaskDetail: &detail{
+			Description:   res.SnapshotTaskDetail.Description,
+			DiskImageSize: res.SnapshotTaskDetail.DiskImageSize,
+			Format:        res.SnapshotTaskDetail.Format,
+			Progress:      res.SnapshotTaskDetail.Progress,
+			SnapshotId:    res.SnapshotTaskDetail.SnapshotId,
+			Status:        res.SnapshotTaskDetail.Status,
+			StatusMessage: res.SnapshotTaskDetail.StatusMessage,
+			Url:           res.SnapshotTaskDetail.Url,
+			UserBucket: &bucket{
+				S3Bucket: res.SnapshotTaskDetail.UserBucket.S3Bucket,
+				S3Key:    res.SnapshotTaskDetail.UserBucket.S3Key,
+			},
+		},
+	}
+
+	return o, nil
 }
 
 func main() {
