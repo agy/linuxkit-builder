@@ -10,33 +10,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
+const (
+	defaultWaitTime = 60
+)
+
 type event struct {
 	Name   string `json:"name"`
 	Bucket string `json:"bucket"`
 	Key    string `json:"key"`
 }
 
-type bucket struct {
-	S3Bucket *string `json:"bucket"`
-	S3Key    *string `json:"key"`
-}
-
-type detail struct {
-	Description   *string  `json:"description"`
-	DiskImageSize *float64 `json:"size"`
-	Format        *string  `json:"format"`
-	Progress      *string  `json:"progress"`
-	SnapshotId    *string  `json:"snapshot_id"`
-	Status        *string  `json:"status"`
-	StatusMessage *string  `json:"status_message"`
-	Url           *string  `json:"url"`
-	UserBucket    *bucket  `json:"bucket"`
-}
-
 type output struct {
 	ImportTaskId *string `json:"task_id"`
-	Description  *string `json:"description"`
-	TaskDetail   *detail `json:"task_detail"`
+	WaitTime     int     `json:"wait_time"`
 }
 
 func importSnapshot(ctx context.Context, e event) (*output, error) {
@@ -65,22 +51,8 @@ func importSnapshot(ctx context.Context, e event) (*output, error) {
 	}
 
 	o := &output{
-		Description:  res.Description,
 		ImportTaskId: res.ImportTaskId,
-		TaskDetail: &detail{
-			Description:   res.SnapshotTaskDetail.Description,
-			DiskImageSize: res.SnapshotTaskDetail.DiskImageSize,
-			Format:        res.SnapshotTaskDetail.Format,
-			Progress:      res.SnapshotTaskDetail.Progress,
-			SnapshotId:    res.SnapshotTaskDetail.SnapshotId,
-			Status:        res.SnapshotTaskDetail.Status,
-			StatusMessage: res.SnapshotTaskDetail.StatusMessage,
-			Url:           res.SnapshotTaskDetail.Url,
-			UserBucket: &bucket{
-				S3Bucket: res.SnapshotTaskDetail.UserBucket.S3Bucket,
-				S3Key:    res.SnapshotTaskDetail.UserBucket.S3Key,
-			},
-		},
+		WaitTime:     defaultWaitTime,
 	}
 
 	return o, nil
