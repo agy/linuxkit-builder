@@ -1,0 +1,19 @@
+{
+    "ImportSnapshotTasks": [
+        {
+            "SnapshotTaskDetail": {
+                "DiskImageSize": 1073741824.0,
+                "Description": "LinuxKit: linuxkit-agy",
+                "SnapshotId": "snap-0f5a9963007009323",
+                "Status": "completed",
+                "Format": "RAW",
+                "UserBucket": {
+                    "S3Key": "aws.raw/aws.raw",
+                    "S3Bucket": "agy-ami"
+                }
+            },
+            "Description": "LinuxKit: linuxkit-agy",
+            "ImportTaskId": "import-snap-fgpdso8v"
+        }
+    ]
+}

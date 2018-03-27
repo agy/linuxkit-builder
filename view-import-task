@@ -1,0 +1,1 @@
+aws ec2 describe-import-snapshot-tasks --import-task-ids <task-id>

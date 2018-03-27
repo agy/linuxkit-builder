@@ -1,0 +1,77 @@
+{
+  "Comment": "A state machine that imports a RAW AWS image as an AMI.",
+  "StartAt": "Start Import",
+  "States": {
+    "Start Import": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:029378057592:function:snapshot-import",
+      "Next": "Wait X Seconds",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Wait X Seconds": {
+      "Type": "Wait",
+      "Seconds": "$.wait_time",
+      "Next": "Get Job Status"
+    },
+    "Get Job Status": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:029378057592:function:snapshot-import-poll",
+      "Next": "Job Complete?",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Job Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "failed",
+          "Next": "Job Failed"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "completed",
+          "Next": "Register Image"
+        }
+      ],
+      "Default": "Wait X Seconds"
+    },
+    "Job Failed": {
+      "Type": "Fail",
+      "Cause": "Snapshot import failed",
+      "Error": "snapshot-import-poll returned FAILED"
+    },
+    "Register Image": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:029378057592:function:snapshot-register",
+      "End": true,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,3 @@
+# aws ec2 import-image --description "Linuxkit AWS" --disk-containers file://import-task.json
+# aws ec2 import-snapshot --description "Linuxkit AWS" --disk-container file://import-task.json
+aws ec2 import-snapshot --disk-container 'Description="Linuxkit AWS",Format=raw,UserBucket={S3Bucket=agy-ami,S3Key=aws.raw/aws.raw}'

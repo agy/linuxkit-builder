@@ -1,0 +1,10 @@
+[
+  {
+    "Description": "Linuxkit AWS",
+    "Format": "raw",
+    "UserBucket": {
+        "S3Bucket": "agy-ami",
+        "S3Key": "aws.raw/aws.raw"
+    }
+  }
+]

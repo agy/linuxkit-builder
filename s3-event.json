@@ -1,0 +1,38 @@
+{
+    "Records": [
+        {
+            "awsRegion": "us-east-1",
+            "eventName": "ObjectCreated:CompleteMultipartUpload",
+            "eventSource": "aws:s3",
+            "eventTime": "2018-03-21T17:43:47.358Z",
+            "eventVersion": "2.0",
+            "requestParameters": {
+                "sourceIPAddress": "10.0.17.157"
+            },
+            "responseElements": {
+                "x-amz-id-2": "EJwgqP+FK1TJzouYOO4hlRJEUJX1oVzpKMZ/YZw75HXe62Eg2M2GqNSymThPkstezwm7UUoMZsU=",
+                "x-amz-request-id": "98AAD9E5CC84672E"
+            },
+            "s3": {
+                "bucket": {
+                    "arn": "arn:aws:s3:::agy-ami",
+                    "name": "agy-ami",
+                    "ownerIdentity": {
+                        "principalId": "A1WMSC2RC8G18R"
+                    }
+                },
+                "configurationId": "YWNiMTJmMWMtNWI4Yy00M2M5LTg3YTQtOTAwMDNkOGFmMjAz",
+                "object": {
+                    "eTag": "053aded6d68561fdb8218776dc4d09a9-205",
+                    "key": "aws.raw/aws.raw",
+                    "sequencer": "005AB299C227FBEFEE",
+                    "size": 1073741824
+                },
+                "s3SchemaVersion": "1.0"
+            },
+            "userIdentity": {
+                "principalId": "AWS:AROAJSNHQ52BTCOOKAHZ6:AWSCodeBuild-c5ee4492-5bb4-4bb3-a1b5-f694e8af1c6d"
+            }
+        }
+    ]
+}

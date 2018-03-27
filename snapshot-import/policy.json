@@ -1,0 +1,31 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ImportSnapshot",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "ec2:ImportSnapshot",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ListBuckets",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "arn:aws:s3:::agy-ami/"
+        },
+        {
+            "Sid": "GetSnapshot",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::agy-ami/aws.raw/*"
+        }
+    ]
+}
