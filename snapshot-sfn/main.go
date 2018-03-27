@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -55,10 +56,7 @@ func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
 		return nil, errors.New("could not encode sfn input")
 	}
 
-	fmt.Println("execInput:", execInput)
-
-	// TODO(agy): Add timestamp
-	execName := name
+	execName := fmt.Sprintf("%s-%d", name, time.Now().Unix())
 
 	input := &sfn.StartExecutionInput{
 		Input:           aws.String(string(execInput)),
@@ -85,8 +83,6 @@ func main() {
 	if stateMachineARN == "" {
 		panic("invalid state machine ARN")
 	}
-
-	fmt.Println("STATEMACHINEARN:", stateMachineARN)
 
 	lambda.Start(invokeSfn)
 }
