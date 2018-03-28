@@ -14,8 +14,11 @@ const (
 	name                = "linuxkit"
 	volumeType          = "standard"
 	deleteOnTermination = true
-	ena                 = false
-	sriovNet            = "" // "simple"
+)
+
+var (
+	sriovNetSupport string
+	enaSupport      bool
 )
 
 type event struct {
@@ -50,8 +53,11 @@ func registerImage(ctx context.Context, e event) (*output, error) {
 		Description:        aws.String(fmt.Sprintf("LinuxKit: %s image", name)),
 		RootDeviceName:     aws.String("/dev/sda1"),
 		VirtualizationType: aws.String("hvm"),
-		EnaSupport:         aws.Bool(ena),
-		SriovNetSupport:    aws.String(sriovNet),
+		EnaSupport:         aws.Bool(enaSupport),
+	}
+
+	if sriovNetSupport != "" {
+		input = input.SetSriovNetSupport(sriovNetSupport)
 	}
 
 	res, err := compute.RegisterImage(input)
