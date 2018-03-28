@@ -11,15 +11,13 @@ import (
 )
 
 type event struct {
+	Status       string `json:"status,omitempty"`
+	SnapshotId   string `json:"snapshot_id,omitempty"`
 	ImportTaskId string `json:"task_id"`
+	WaitTime     int    `json:"wait_time"`
 }
 
-type output struct {
-	Status     string `json:"status"`
-	SnapshotId string `json:"snapshot_id,omitempty"`
-}
-
-func importSnapshotPoll(ctx context.Context, e event) (*output, error) {
+func importSnapshotPoll(ctx context.Context, e event) (*event, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -42,9 +40,16 @@ func importSnapshotPoll(ctx context.Context, e event) (*output, error) {
 		return nil, fmt.Errorf("unable to read import snapshot task status")
 	}
 
-	o := &output{
-		Status:     *res.ImportSnapshotTasks[0].SnapshotTaskDetail.Status,
-		SnapshotId: *res.ImportSnapshotTasks[0].SnapshotTaskDetail.SnapshotId,
+	detail := res.ImportSnapshotTasks[0].SnapshotTaskDetail
+
+	o := &event{
+		Status:       *detail.Status,
+		ImportTaskId: e.ImportTaskId,
+		WaitTime:     e.WaitTime,
+	}
+
+	if detail.SnapshotId != nil {
+		o.SnapshotId = *detail.SnapshotId
 	}
 
 	return o, nil
