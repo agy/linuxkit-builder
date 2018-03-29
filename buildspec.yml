@@ -10,7 +10,7 @@ phases:
     commands:
       - curl -sOL https://s3.amazonaws.com/agy-public/linuxkit
       - echo "${LINUXKIT_SHA256}" linuxkit | sha256sum -c -
-      - install --mode 0755 linuxkit /usr/bin/linuxkit
+      - install --mode 0755 linuxkit /usr/bin/linuxkit && rm -f linuxkit
 
   build:
     commands:
