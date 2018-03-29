@@ -3,15 +3,14 @@ version: 0.2
 
 env:
   variables:
-    LINUXKIT_VERSION: "0.2"
-    LINUXKIT_SHA256: "fb67cac846a3915fc195a2fe0b28bfd1277928a4066c0cf735f91fcceb8bc54b"
+    LINUXKIT_SHA256: "4957a1b0357f9d30a297e71ee2ba5c9ddf417428aa0116a4057e10cfd1f75a28"
 
 phases:
   pre_build:
     commands:
-      - curl -sOL https://github.com/linuxkit/linuxkit/releases/download/v${LINUXKIT_VERSION}/linuxkit-linux-amd64
-      - echo "${LINUXKIT_SHA256}" linuxkit-linux-amd64 | sha256sum -c -
-      - install --mode 0755 linuxkit-linux-amd64 /usr/bin/linuxkit
+      - curl -sOL https://s3.amazonaws.com/agy-public/linuxkit
+      - echo "${LINUXKIT_SHA256}" linuxkit | sha256sum -c -
+      - install --mode 0755 linuxkit /usr/bin/linuxkit
 
   build:
     commands:
