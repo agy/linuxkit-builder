@@ -13,6 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sfn"
+
+	"github.com/agy/linuxkit-builder/pkg/task"
 )
 
 const (
@@ -22,12 +24,6 @@ const (
 var (
 	stateMachineARN = ""
 )
-
-type output struct {
-	Name   string `json:"name"`
-	Bucket string `json:"bucket"`
-	Key    string `json:"key"`
-}
 
 func parseEvent(e events.S3Event) (string, string, error) {
 	if len(e.Records) == 0 {
@@ -39,7 +35,7 @@ func parseEvent(e events.S3Event) (string, string, error) {
 	return s3.Bucket.Name, s3.Object.Key, nil
 }
 
-func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
+func invokeSfn(ctx context.Context, e events.S3Event) (*task.Task, error) {
 	lctx, ok := lambdacontext.FromContext(ctx)
 	if !ok {
 		panic(errors.New("cannot decode lambda context"))
@@ -50,13 +46,13 @@ func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
 		return nil, err
 	}
 
-	sfnInput := &output{
+	t := &task.Task{
 		Name:   name,
 		Bucket: bucket,
 		Key:    key,
 	}
 
-	execInput, err := json.Marshal(sfnInput)
+	execInput, err := json.Marshal(t)
 	if err != nil {
 		return nil, errors.New("could not encode sfn input")
 	}
@@ -80,7 +76,7 @@ func invokeSfn(ctx context.Context, e events.S3Event) (*output, error) {
 		return nil, err
 	}
 
-	return sfnInput, nil
+	return t, nil
 }
 
 func main() {

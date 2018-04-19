@@ -17,13 +17,7 @@ const (
 	format          = "raw"
 )
 
-type event struct {
-	Name   string `json:"name"`
-	Bucket string `json:"bucket"`
-	Key    string `json:"key"`
-}
-
-func importSnapshot(ctx context.Context, e event) (*task.Task, error) {
+func importSnapshot(ctx context.Context, t task.Task) (*task.Task, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -32,13 +26,13 @@ func importSnapshot(ctx context.Context, e event) (*task.Task, error) {
 	compute := ec2.New(s)
 
 	input := &ec2.ImportSnapshotInput{
-		Description: aws.String(fmt.Sprintf("LinuxKit: %s", e.Name)),
+		Description: aws.String(fmt.Sprintf("LinuxKit: %s", t.Name)),
 		DiskContainer: &ec2.SnapshotDiskContainer{
-			Description: aws.String(fmt.Sprintf("LinuxKit: %s disk", e.Name)),
+			Description: aws.String(fmt.Sprintf("LinuxKit: %s disk", t.Name)),
 			Format:      aws.String(format),
 			UserBucket: &ec2.UserBucket{
-				S3Bucket: aws.String(e.Bucket),
-				S3Key:    aws.String(e.Key),
+				S3Bucket: aws.String(t.Bucket),
+				S3Key:    aws.String(t.Key),
 			},
 		},
 	}
@@ -48,12 +42,12 @@ func importSnapshot(ctx context.Context, e event) (*task.Task, error) {
 		return nil, err
 	}
 
-	t := &task.Task{
+	output := &task.Task{
 		ImportTaskId: res.ImportTaskId,
 		WaitTime:     defaultWaitTime,
 	}
 
-	return t, nil
+	return output, nil
 }
 
 func main() {
