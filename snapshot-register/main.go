@@ -11,9 +11,12 @@ import (
 )
 
 const (
-	name                = "linuxkit"
-	volumeType          = "standard"
+	arch                = "x86_64"
 	deleteOnTermination = true
+	name                = "linuxkit"
+	rootDevice          = "/dev/sda1"
+	virtType            = "hvm"
+	volumeType          = "standard"
 )
 
 var (
@@ -39,10 +42,10 @@ func registerImage(ctx context.Context, e event) (*output, error) {
 
 	input := &ec2.RegisterImageInput{
 		Name:         aws.String(name),
-		Architecture: aws.String("x86_64"),
+		Architecture: aws.String(arch),
 		BlockDeviceMappings: []*ec2.BlockDeviceMapping{
 			{
-				DeviceName: aws.String("/dev/sda1"),
+				DeviceName: aws.String(rootDevice),
 				Ebs: &ec2.EbsBlockDevice{
 					DeleteOnTermination: aws.Bool(deleteOnTermination),
 					SnapshotId:          aws.String(e.SnapshotId),
@@ -51,8 +54,8 @@ func registerImage(ctx context.Context, e event) (*output, error) {
 			},
 		},
 		Description:        aws.String(fmt.Sprintf("LinuxKit: %s image", name)),
-		RootDeviceName:     aws.String("/dev/sda1"),
-		VirtualizationType: aws.String("hvm"),
+		RootDeviceName:     aws.String(rootDevice),
+		VirtualizationType: aws.String(virtType),
 		EnaSupport:         aws.Bool(enaSupport),
 	}
 
