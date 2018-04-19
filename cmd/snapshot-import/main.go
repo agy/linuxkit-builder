@@ -8,10 +8,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+
+	"github.com/agy/linuxkit-builder/pkg/task"
 )
 
 const (
 	defaultWaitTime = 60
+	format          = "raw"
 )
 
 type event struct {
@@ -20,12 +23,7 @@ type event struct {
 	Key    string `json:"key"`
 }
 
-type output struct {
-	ImportTaskId *string `json:"task_id"`
-	WaitTime     int     `json:"wait_time"`
-}
-
-func importSnapshot(ctx context.Context, e event) (*output, error) {
+func importSnapshot(ctx context.Context, e event) (*task.Task, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -37,7 +35,7 @@ func importSnapshot(ctx context.Context, e event) (*output, error) {
 		Description: aws.String(fmt.Sprintf("LinuxKit: %s", e.Name)),
 		DiskContainer: &ec2.SnapshotDiskContainer{
 			Description: aws.String(fmt.Sprintf("LinuxKit: %s disk", e.Name)),
-			Format:      aws.String("raw"),
+			Format:      aws.String(format),
 			UserBucket: &ec2.UserBucket{
 				S3Bucket: aws.String(e.Bucket),
 				S3Key:    aws.String(e.Key),
@@ -50,12 +48,12 @@ func importSnapshot(ctx context.Context, e event) (*output, error) {
 		return nil, err
 	}
 
-	o := &output{
+	t := &task.Task{
 		ImportTaskId: res.ImportTaskId,
 		WaitTime:     defaultWaitTime,
 	}
 
-	return o, nil
+	return t, nil
 }
 
 func main() {

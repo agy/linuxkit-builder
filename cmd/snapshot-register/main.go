@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+
+	"github.com/agy/linuxkit-builder/pkg/task"
 )
 
 const (
@@ -24,15 +26,7 @@ var (
 	enaSupport      bool
 )
 
-type event struct {
-	SnapshotId string `json:"snapshot_id"`
-}
-
-type output struct {
-	ImageId string `json:"image_id"`
-}
-
-func registerImage(ctx context.Context, e event) (*output, error) {
+func registerImage(ctx context.Context, t task.Task) (*task.Task, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -48,7 +42,7 @@ func registerImage(ctx context.Context, e event) (*output, error) {
 				DeviceName: aws.String(rootDevice),
 				Ebs: &ec2.EbsBlockDevice{
 					DeleteOnTermination: aws.Bool(deleteOnTermination),
-					SnapshotId:          aws.String(e.SnapshotId),
+					SnapshotId:          aws.String(t.SnapshotId),
 					VolumeType:          aws.String(volumeType),
 				},
 			},
@@ -68,11 +62,11 @@ func registerImage(ctx context.Context, e event) (*output, error) {
 		return nil, err
 	}
 
-	o := &output{
+	output := &task.Task{
 		ImageId: *res.ImageId,
 	}
 
-	return o, nil
+	return output, nil
 }
 
 func main() {

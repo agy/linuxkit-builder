@@ -5,19 +5,13 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+
+	"github.com/agy/linuxkit-builder/pkg/task"
 )
 
-type event struct {
-	Status       string `json:"status,omitempty"`
-	SnapshotId   string `json:"snapshot_id,omitempty"`
-	ImportTaskId string `json:"task_id"`
-	WaitTime     int    `json:"wait_time"`
-}
-
-func importSnapshotPoll(ctx context.Context, e event) (*event, error) {
+func importSnapshotPoll(ctx context.Context, t task.Task) (*task.Task, error) {
 	s, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -27,7 +21,7 @@ func importSnapshotPoll(ctx context.Context, e event) (*event, error) {
 
 	input := &ec2.DescribeImportSnapshotTasksInput{
 		ImportTaskIds: []*string{
-			aws.String(e.ImportTaskId),
+			t.ImportTaskId,
 		},
 	}
 
@@ -42,17 +36,17 @@ func importSnapshotPoll(ctx context.Context, e event) (*event, error) {
 
 	detail := res.ImportSnapshotTasks[0].SnapshotTaskDetail
 
-	o := &event{
+	output := &task.Task{
 		Status:       *detail.Status,
-		ImportTaskId: e.ImportTaskId,
-		WaitTime:     e.WaitTime,
+		ImportTaskId: t.ImportTaskId,
+		WaitTime:     t.WaitTime,
 	}
 
 	if detail.SnapshotId != nil {
-		o.SnapshotId = *detail.SnapshotId
+		output.SnapshotId = *detail.SnapshotId
 	}
 
-	return o, nil
+	return output, nil
 }
 
 func main() {
