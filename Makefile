@@ -1,24 +1,12 @@
 CONTAINER := agy/linuxkit
+BINARIES := snapshot-import snapshot-import-poll snapshot-register snapshot-sfn
 
 
 # container:
 # 	docker build --tag $(CONTAINER) .
 
 .PHONY: all
-all: snapshot-import snapshot-import-poll snapshot-register snapshot-sfn
+all: $(BINARIES)
 
-.PHONY: snapshot-import
-snapshot-import:
-	go build -o bin/$@ cmd/$@/main.go
-
-.PHONY: snapshot-import-poll
-snapshot-import-poll:
-	go build -o bin/$@ cmd/$@/main.go
-
-.PHONY: snapshot-register
-snapshot-register:
-	go build -o bin/$@ cmd/$@/main.go
-
-.PHONY: snapshot-sfn
-snapshot-sfn:
-	go build -o bin/$@ cmd/$@/main.go
+%:
+	go build -o bin/$@ $(wildcard cmd/$@/*.go)
