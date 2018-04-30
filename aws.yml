@@ -1,19 +1,29 @@
 kernel:
   image: linuxkit/kernel:4.14.29
   cmdline: "console=ttyS0"
+
 init:
   - linuxkit/init:7af4e32f31f04d6c63d457c502d2f69344db7d72
   - linuxkit/runc:e4b01b68b225d694a60f8b335258bd2144971239
   - linuxkit/containerd:d03b69c7d23fdae0fec1b6e62a72d362992135df
   - linuxkit/ca-certificates:04a6dc9e5c901ee128c353f690bd97aeb7d97ae8
+
 onboot:
   - name: sysctl
     image: linuxkit/sysctl:e7106b5e3db64a9ec21eb1479727627ecf52137d
+  - name: sysfs
+    image: linuxkit/sysfs:98b340d360541f1e1e62bc30b62ab6a7e3dc9280
+  - name: format
+    image: linuxkit/format:d24885a226c42a40f7ed44dd3789a6a035254d98
+  - name: mount
+    image: linuxkit/mount:763e67d733342281f3bdc55d7208b9c442837afe
+    command: ["/usr/bin/mountie", "/srv"]
   - name: dhcpcd
     image: linuxkit/dhcpcd:8b23f047ffa4d657a2c7dd465e69cc13721c4165
     command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
   - name: metadata
     image: linuxkit/metadata:09272c373fa10b9a09f2c9fe380bffb4402f98f6
+
 services:
   - name: rngd
     image: linuxkit/rngd:8bcfb9a90470161a04f25e58407852a3d1ad499a
@@ -21,6 +31,7 @@ services:
     image: linuxkit/sshd:b24724013759bbcb084600d1157735ccfc9aa615
     binds:
      - /run/config/ssh/authorized_keys:/root/.ssh/authorized_keys
+
 trust:
   org:
     - linuxkit
