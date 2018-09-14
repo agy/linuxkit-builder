@@ -20,6 +20,7 @@ onboot:
     command: ["/usr/bin/mountie", "/var/lib/docker"]
   - name: dhcpcd
     image: linuxkit/dhcpcd:v0.6
+    command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
   - name: metadata
     image: linuxkit/metadata:v0.6
 
