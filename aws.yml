@@ -1,36 +1,57 @@
 kernel:
-  image: linuxkit/kernel:4.14.29
+  image: linuxkit/kernel:4.14.68
   cmdline: "console=ttyS0"
 
 init:
-  - linuxkit/init:7af4e32f31f04d6c63d457c502d2f69344db7d72
-  - linuxkit/runc:e4b01b68b225d694a60f8b335258bd2144971239
-  - linuxkit/containerd:d03b69c7d23fdae0fec1b6e62a72d362992135df
-  - linuxkit/ca-certificates:04a6dc9e5c901ee128c353f690bd97aeb7d97ae8
+  - linuxkit/init:e24105ebb339e1a2e578fde7ec8bccf844a633d5
+  - linuxkit/runc:1dc6559fd0a9a332c740312637af0c3fbe6bafa3
+  - linuxkit/containerd:ed0589d53e29890b0e504f594a0e4af7326b6484
+  - linuxkit/ca-certificates:v0.6
 
 onboot:
   - name: sysctl
-    image: linuxkit/sysctl:e7106b5e3db64a9ec21eb1479727627ecf52137d
+    image: linuxkit/sysctl:v0.6
   - name: sysfs
-    image: linuxkit/sysfs:98b340d360541f1e1e62bc30b62ab6a7e3dc9280
+    image: linuxkit/sysfs:v0.6
   - name: format
-    image: linuxkit/format:d24885a226c42a40f7ed44dd3789a6a035254d98
+    image: linuxkit/format:v0.6
   - name: mount
-    image: linuxkit/mount:763e67d733342281f3bdc55d7208b9c442837afe
-    command: ["/usr/bin/mountie", "/srv"]
+    image: linuxkit/mount:v0.6
+    command: ["/usr/bin/mountie", "/var/lib/docker"]
   - name: dhcpcd
-    image: linuxkit/dhcpcd:8b23f047ffa4d657a2c7dd465e69cc13721c4165
-    command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
+    image: linuxkit/dhcpcd:v0.6
   - name: metadata
     image: linuxkit/metadata:09272c373fa10b9a09f2c9fe380bffb4402f98f6
 
 services:
   - name: rngd
-    image: linuxkit/rngd:8bcfb9a90470161a04f25e58407852a3d1ad499a
+    image: linuxkit/rngd:v0.6
   - name: sshd
     image: linuxkit/sshd:b24724013759bbcb084600d1157735ccfc9aa615
     binds:
      - /run/config/ssh/authorized_keys:/root/.ssh/authorized_keys
+  - name: ntpd
+    image: linuxkit/openntpd:v0.6
+  - name: docker
+    image: docker:18.06.0-ce-dind
+    capabilities:
+     - all
+    net: host
+    mounts:
+     - type: cgroup
+       options: ["rw","nosuid","noexec","nodev","relatime"]
+    binds:
+     - /etc/resolv.conf:/etc/resolv.conf
+     - /var/lib/docker:/var/lib/docker
+     - /lib/modules:/lib/modules
+     - /etc/docker/daemon.json:/etc/docker/daemon.json
+    command: ["/usr/local/bin/docker-init", "/usr/local/bin/dockerd"]
+
+files:
+  - path: var/lib/docker
+    directory: true
+  - path: etc/docker/daemon.json
+    contents: '{"debug": true}'
 
 trust:
   org:
