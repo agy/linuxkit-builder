@@ -21,13 +21,13 @@ onboot:
   - name: dhcpcd
     image: linuxkit/dhcpcd:v0.6
   - name: metadata
-    image: linuxkit/metadata:09272c373fa10b9a09f2c9fe380bffb4402f98f6
+    image: linuxkit/metadata:v0.6
 
 services:
   - name: rngd
     image: linuxkit/rngd:v0.6
   - name: sshd
-    image: linuxkit/sshd:b24724013759bbcb084600d1157735ccfc9aa615
+    image: linuxkit/sshd:v0.6
     binds:
      - /run/config/ssh/authorized_keys:/root/.ssh/authorized_keys
   - name: ntpd
