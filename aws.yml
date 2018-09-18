@@ -31,6 +31,20 @@ services:
     image: linuxkit/sshd:v0.6
     binds:
      - /run/config/ssh/authorized_keys:/root/.ssh/authorized_keys
+     - /etc/resolv.conf:/etc/resolv.conf
+     - /run:/run
+     - /tmp:/tmp
+     - /etc:/hostroot/etc
+     - /usr/bin/ctr:/usr/bin/ctr
+     - /usr/bin/runc:/usr/bin/runc
+     - /containers:/containers
+     - /var/log:/var/log
+     - /dev:/dev
+     - /sys:/sys
+    capabilities:
+     - all
+    net: host
+    pid: host
   - name: ntpd
     image: linuxkit/openntpd:v0.6
   - name: docker
