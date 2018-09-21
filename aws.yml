@@ -34,13 +34,13 @@ services:
      - /etc/resolv.conf:/etc/resolv.conf
      - /run:/run
      - /tmp:/tmp
-     - /etc:/hostroot/etc
      - /usr/bin/ctr:/usr/bin/ctr
      - /usr/bin/runc:/usr/bin/runc
      - /containers:/containers
      - /var/log:/var/log
      - /dev:/dev
      - /sys:/sys
+     - /:/hostroot
     capabilities:
      - all
     net: host
